@@ -1,0 +1,10 @@
+pacman
+readr
+dplyr
+readxl
+magrittr
+broom
+ggplot2
+tidyr
+stargazer
+sandwich

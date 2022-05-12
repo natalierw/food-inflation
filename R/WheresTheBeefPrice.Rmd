@@ -3,8 +3,9 @@ title: "Where's the Beef... <em>Price</em>?"
 author: Natalie Walker 
 date: "November 24th, 2021"
 output:
-  pdf_document: default 
-  html_document: default 
+  md_document: default 
+  html_document: default
+  pdf_document: default
 ---
 ```{r echo=FALSE}
 #This block code will make knitting faster by saving output of code chunks.
