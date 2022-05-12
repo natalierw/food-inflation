@@ -1,0 +1,773 @@
+---
+title: "Where's the Beef... <em>Price</em>?"
+author: Natalie Walker 
+date: "November 24th, 2021"
+output:
+  pdf_document: default 
+  html_document: default 
+---
+```{r echo=FALSE}
+#This block code will make knitting faster by saving output of code chunks.
+# Note that code chunks won't re-run unless you edit them so be careful!
+knitr::opts_chunk$set(cache =TRUE)
+```
+
+```{r setup, echo = FALSE}
+#average food price data 
+library(pacman)
+p_load("readr",'dplyr','readxl', 'magrittr', 'broom', 'ggplot2', 'tidyr')
+```
+
+```{r echo = FALSE, message = FALSE}
+# chicken breast bonless
+chick <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_chickenbreast_boneless.xlsx")
+# add series title and series id as columns 
+chick$series_id <- "APU0000FF1101"
+chick$series_name <- "Chicken Breast, Boneless, per lb."
+# remove top rows 
+chick <- chick[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+chick %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+chick[cols.num] <- sapply(chick[cols.num],as.numeric)
+
+```
+```{r echo = FALSE, message = FALSE}
+pork_other <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_allotherpork.xlsx")
+# add series title and series id as columns 
+pork_other$series_id <- "APU0000FD4101"
+pork_other$series_name <- "All Other Pork, per lb."
+# remove top rows 
+pork_other <- pork_other[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+pork_other %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+pork_other[cols.num] <- sapply(pork_other[cols.num],as.numeric)
+
+```
+```{r echo = FALSE, message = FALSE}
+# pork chops
+pork_chops <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_allchops.xlsx")
+# add series title and series id as columns 
+pork_chops$series_id <- "APU0000FD3101"
+pork_chops$series_name <- "All Pork Chops, per lb."
+# remove top rows 
+pork_chops <- pork_chops[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+pork_chops %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+pork_chops[cols.num] <- sapply(pork_chops[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+ham <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_allham.xlsx")
+# add series title and series id as columns 
+ham$series_id <- "APU0000FD2101"
+ham$series_name <- "All Ham, per lb."
+# remove top rows 
+ham <- ham[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+ham %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+ham[cols.num] <- sapply(ham[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+beefsteak <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_alluncooked_beefsteaks.xlsx")
+# add series title and series id as columns 
+beefsteak$series_id <- "APU0000FC3101"
+beefsteak$series_name <- "All Uncooked Beef Steaks, per lb."
+# remove top rows 
+beefsteak <- beefsteak[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+beefsteak %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+beefsteak[cols.num] <- sapply(beefsteak[cols.num],as.numeric)
+```
+
+```{r echo = FALSE, message = FALSE}
+beef_other <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_alluncooked_otherbeef.xlsx")
+# add series title and series id as columns 
+beef_other$series_id <- "APU0000FC4101"
+beef_other$series_name <- "All Uncooked Other Beef, per lb."
+# remove top rows 
+beef_other <- beef_other[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+beef_other %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+beef_other[cols.num] <- sapply(beef_other[cols.num],as.numeric)
+```
+
+```{r  echo = FALSE, message = FALSE}
+beefroasts <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_alluncooked_beefroasts.xlsx")
+# add series title and series id as columns 
+beefroasts$series_id <- "APU0000FC2101"
+beefroasts$series_name <- "All Uncooked Beef Roasts, per lb."
+# remove top rows 
+beefroasts <- beefroasts[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+beefroasts %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+beefroasts[cols.num] <- sapply(beefroasts[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+beefground <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_alluncookedgroundbeef.xlsx")
+# add series title and series id as columns 
+beefground$series_id <- "APU0000FC1101"
+beefground$series_name <- "All Uncooked Ground Beef, per lb."
+# remove top rows 
+beefground <- beefground[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+beefground %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+beefground[cols.num] <- sapply(beefground[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+eggs <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_eggs.xlsx")
+# add series title and series id as columns 
+eggs$series_id <- "APU0000708111"
+eggs$series_name <- "Eggs, Grade A, Large, per doz."
+# remove top rows 
+eggs<- eggs[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+eggs %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+eggs[cols.num] <- sapply(eggs[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+whole_chick <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_chicken_whole.xlsx")
+# add series title and series id as columns 
+whole_chick$series_id <- "APU0000706111"
+whole_chick$series_name <- "Chicken, Fresh, Whole, per lb."
+# remove top rows 
+whole_chick <- whole_chick[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+whole_chick  %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+whole_chick[cols.num] <- sapply(whole_chick[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+turkey <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_tukrkeywhole_frozen.xlsx")
+# add series title and series id as columns 
+turkey$series_id <- "APU0000706311"
+turkey$series_name <- "Turkey, Frozen, Whole, per lb."
+# remove top rows 
+turkey <- turkey[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+turkey  %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+turkey[cols.num] <- sapply(turkey[cols.num],as.numeric)
+```
+```{r echo = FALSE, message = FALSE}
+chicken_legs <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpichickenlegs.xlsx")
+# add series title and series id as columns 
+chicken_legs$series_id <- "APU0000706212"
+chicken_legs$series_name <- "Chicken Legs, Bone-In, per lb."
+# remove top rows 
+chicken_legs<- chicken_legs[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+chicken_legs  %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+chicken_legs[cols.num] <- sapply(chicken_legs[cols.num],as.numeric)
+```
+```{r  echo = FALSE, message = FALSE}
+milk <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_milk_whole.xlsx")
+# add series title and series id as columns 
+milk$series_id <- "APU0000709112"
+milk$series_name <- "Milk, Fresh, Whole, Fortified, per gal."
+# remove top rows 
+milk <- milk[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+milk %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+milk[cols.num] <- sapply(milk[cols.num],as.numeric)
+```
+
+```{r echo = FALSE, message = FALSE}
+butter <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_butter_salted_0012.xlsx")
+# add series title and series id as columns 
+butter$series_id <- "APU0000710111"
+butter$series_name <- "Butter, Salted, Grade AA, Stick, per lb."
+# remove top rows 
+butter <- butter[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+butter %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+butter[cols.num] <- sapply(butter[cols.num],as.numeric)
+```
+
+```{r echo = FALSE, message = FALSE}
+cheddarcheese <- read_xlsx("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_cheddarcheese.xlsx")
+# add series title and series id as columns 
+cheddarcheese$series_id <- "APU0000710212"
+cheddarcheese$series_name <- "Cheddar Cheese, Natural, per lb."
+# remove top rows 
+cheddarcheese <- cheddarcheese[-c(1,2,3,4,5,6,7,8,9),]
+# rename columns
+cheddarcheese %<>% rename("year"= "CPI Average Price Data, U.S. city average (AP)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+cheddarcheese[cols.num] <- sapply(cheddarcheese[cols.num],as.numeric)
+```
+```{r  echo = FALSE}
+cpi <- bind_rows(chick, pork_chops, pork_other, whole_chick, turkey, chicken_legs, eggs, beef_other, beefground, beefroasts, beefsteak, milk, butter, cheddarcheese)
+cpi$year <- factor(cpi$year)
+cpi$day <- "01"
+cpi %<>% gather(month, price, "01":"12", factor_key=TRUE) %>%
+  unite(date,year, month, day, sep = "-")
+cpi$date <- as.Date(cpi$date, format = "%Y-%m-%d")
+
+cpi %<>% 
+  mutate(type = ifelse(series_name == "All Other Pork, per lb."|series_name == "All Pork Chops, per lb.", "Pork",
+                ifelse(series_name == "All Uncooked Beef Roasts, per lb."|
+                         series_name == "All Uncooked Beef Steaks,per lb."|
+                         series_name == "All Uncooked Ground Beef, per lb."|
+                         series_name == "All Uncooked Other Beef, per lb."|
+                         series_name == "All Uncooked Beef Steaks, per lb.", "Beef",
+                ifelse(series_name == "Chicken Breast, Boneless, per lb."|
+                        series_name == "Chicken, Fresh, Whole, per lb."|
+                        series_name == "Turkey, Frozen, Whole, per lb."|
+                        series_name == "Chicken Legs, Bone-In, per lb.", "Poultry",
+                ifelse(series_name == "Eggs, Grade A, Large, per doz.", "Eggs", 
+                ifelse(series_name == "Milk, Fresh, Whole, Fortified, per gal."|
+                        series_name == "Butter, Salted, Grade AA, Stick, per lb."|
+                        series_name == "Cheddar Cheese, Natural, per lb.", "Dairy",""))))))
+            
+
+```
+
+```{r  echo = FALSE}
+#import cpi data food at home and food away 
+food <- read.csv("/Users/natalie/Documents/Economics\ /cpi\ data/foodathome_foodaway_cpi.csv")
+food <- subset(food,select= -c(Year,Period))
+food %<>% rename("series_id"="Series.ID",
+                "cpi"= "Value",
+                "one_mo_perc_change" = "X1.Month...Change",
+                "three_mo_perc_change"= "X3.Month...Change",
+                "six_mo_perc_change"= "X6.Month...Change",
+                "year_perc_change"= "X12.Month...Change")
+#SUUR0000SAF11 = food at home
+#SUUR0000SEFV = food away
+food %<>% mutate(series_name = ifelse(series_id ==  "SUUR0000SAF11", "Food At Home", 
+                                       ifelse(series_id == "SUUR0000SEFV", "Food Away", "")))
+food %<>% separate(Label, c("year", "month"), " ")
+food$day <- "01"
+food %<>% unite(date,year, month, day, sep = "-")
+food$date <- as.Date(food$date, format = "%Y-%b-%d")
+
+```
+# Introduction 
+A few weekends ago, I was scrolling through one of my favorite food blogs and came across a wonderful recipe for lasagna. I only needed a few ingredients so I headed to the store. When I arrived at the checkout line with a small basket of items, I was shocked when my total was $37! Recently, it seems that every time I leave the store, I am dumbfounded at the amount of grocery bags I unpack relative to the number at the bottom of the receipt and I am likely not the only one. On November 10th, the Department of Labor announced the Consumer Price Index (CPI) summary which shows the level of inflation on a yearly basis. The CPI increased 6.2% overall since this time last year. The CPI for food purchased from grocery stores has increased by 5.4% in the last year, meaning that food items cost 5.4% more than they did last year.
+<br>
+To understand where these increases in food prices come from, we need to go back to the start of the pandemic. When President Trump declared a nation-wide state of emergency on March 13th, 2020, we were already observing shortages in things such as cleaning supplies, bottled water, non-perishable foods, hand sanitizer, medicine, and of course, toilet paper due to COVID-19. The lines at grocery stores were spinning out of control as panic-induced demand took hold. Throughout the month of March and into April food shortages were reported across the United States; on March 2nd the Washington Post published an article entitled, “Long lines, low supplies: Coronavirus chaos sends shoppers into panic-buying mode” and on March 16th, the New York Times reported “Panicked Shoppers Empty Shelves as Coronavirus Anxiety Rises”, along with many other news sources publishing similar headlines. Disruptions to global and local supply chains closely followed the sudden increase in demand as the Coronavirus spread and created upward pressure on prices in the retail food industry. As Americans struggle with the economic and health impacts of the crisis, the sudden increase in food prices has burdened the American family even further. The food insecurity rate doubled in 2020 due to the increase in unemployment, school closures, and elevated food prices. The increased food prices have a big impact on individuals and families because Americans spend, on average, 10% of their personal disposable income (DPI) on food, with 4.7% spent on food purchased from restaurants and 4.9% spent on food purchased at grocery stores in 2019. 
+
+# Data
+The Bureau of Labor Statistics (BLS) tracks labor market activity, working conditions, productivity in the economy, and prices. A common measure of price inflation is called the Consumer Price Index (CPI) which is calculated by dividing the price of a basket of items that the average U.S. household consumes in one month by the same basket in another month multiplied by 100 which creates an index of price. The BLS uses survey information from American families to determine what constitutes “the average basket of goods” and then CPI data collectors head to their local grocery store and note the prices of each item. The CPI is different for urban and non-urban consumers, and in this analysis I have chosen to use data for urban consumers considering that 93% of the US population lives in urban areas. I am using their monthly reports of average prices on specific food items and the overall CPI for food purchased for at-home consumption (Food At Home) and food purchased from restaurants (Food Away). I have selected average price data for products that fall into these main categories: beef, pork, poultry, eggs, and dairy. I chose the items within those categories based on whether the prices dated back to the early 2000s and the relevance of them to the category. For example, I did not include ice cream prices in the dairy category because milk and eggs are the main ingredients in ice cream so we can understand a general trend in dairy prices without including ice cream. In the meat categories, I have pulled prices for the cuts of meat that include all qualities of meat and had price information in my target time period.
+
+# What is happening to prices for food over time?
+<p>Using the CPI data from the Bureau of Labor Statistics (BLS), we can see that the CPI for Food At Home increased by 7.5 or a 5.1% increase in CPI between March 2020 and October 2021. For Food Away, the CPI increased by 14.3 or a 4.9% increase during the same time period. The impact on Food Away prices did not take into effect until after the initial lock-down concluded. By August of 2020, Food Away prices had increased by roughly 4 as most restaurants were allowed to re-open at some capacity level depending on state laws, but across March, April, and May the CPI increased by 1 each month. As restaurants and the hospitality industry shut down, their demand for food products disappeared so a reallocation of food that would normally supply restaurants and hotels was required to meet the demand coming from the retail food market. However, food packaging requirements are different depending on which market the final good is being sold in so manufacturers had to readjust their packing procedures which especially impacted the meat, egg, and dairy industries. Once restaurants were allowed to reopen, their prices began to increase just like Food At Home prices. 
+<br>
+In the early 2000s food prices were relatively stable around 2.5% yearly inflation but between 2007 and 2008 food prices began to rise above the inflation rate for other goods mostly due to increased demand driven by income increases. Once the Great Recession took hold, food prices reflected the deflationary pressures of the economy and by 2012, they had stabilized again.<em> Note: the grey bar shows the Great Recession and the dotted red line marks April 1st, 2020.</em></p>
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.align='center'}
+# food prices close to pandemic graph 1
+min <- as.Date("2000-01-01")
+max <- as.Date("2021-09-01")
+ggplot(data = food, aes(x=date, y=cpi)) + geom_line(aes(color=series_name), size=1) + scale_x_date(date_breaks = "12 month", date_labels = "%Y", limits=c(min,max)) +
+labs(y = "Raw CPI", x= "Time", title = "CPI Value for Food Consumption", subtitle = "January 2000 - October 2021") +
+scale_color_manual(name = "Type of Food Purchased", values = c("#00AFBB", "#E7B800")) + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = -1, ymax = 250, alpha = .3) + geom_vline(xintercept = as.Date("2020-03-13"), linetype =  "dotted", color = "red")
+```
+```{r echo = FALSE, eval = FALSE}
+# do not include !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# CPI change M-O-M
+min <-as.Date("2000-01-01")
+max <- as.Date("2021-11-01")
+food %>%
+      ggplot(aes(x=date, y = one_mo_perc_change)) +
+      geom_line(aes(color = series_name)) + scale_x_date(date_breaks = "12 months", date_labels = "%Y", limits=c(min,max)) + labs(y = "1 Month Percent Change", x= "Year", title = "Month Over Month Percent Change in CPI", subtitle = "January 2000 - October 2021") + scale_color_manual(name = "Type of Food Purchased", values = c("#00AFBB", "#E7B800")) + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = -1, ymax = 3, alpha = .3) + geom_vline(xintercept = as.Date("2020-03-13"), linetype =  "dotted", color = "red")
+```
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.align='center'}
+# CPI change M-O-M
+food %>% filter(date > as.Date("2020-01-01")) %>%
+  filter(series_name ==  "Food At Home") %>%
+      ggplot(aes(x=date, y = one_mo_perc_change)) +
+      geom_line(color = "#00AFBB") + scale_x_date(date_breaks = "1 month", date_labels = "%b-%Y", ) + labs(y = "1 Month Percent Change", x= "Time", title = "Month Over Month Percent Change in CPI", subtitle = "For Food at Home, January 2020 - October 2021")  + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + geom_vline(xintercept = as.Date("2020-03-13"), linetype =  "dotted", color = "red")
+```
+<p>The month-over-month change in CPI tells us the percent difference in the CPI value from one month to the next. We can see that in April 2020 the CPI increased by 2.6% which was **the largest one-month increase in the last 20 years** which is much worse than the volatility we observed during the 2008 recession. The severity of this monthly spike emphasizes the sudden impact of COVID-19 on both the demand and supply sides. After the initial spike in food prices, the month-to-month change in CPI for Food At Home lowered over May 2020 through November 2020 but then began to rise again. The one-month change in CPI from September 2021 to October 2021 was 1.2%, the largest one-month increase since April 2020.</p>
+
+```{r echo = FALSE, eval = FALSE }
+# for own examination of cpi
+food %>% 
+  filter(date > as.Date("2019-01-01")) %>%
+  group_by(series_name)
+#food at home increase from march to may in nominal cpi
+139.023 - 137.685
+#food at home increase from march to october nominal cpi
+138.122	- 137.685
+# food at home increase from oct 2020 to oct 2021
+145.178 -	138.122	
+# food at home increase from march 2020 to oct 2021
+145.178 -	137.685	
+# food away increase from march to may nominal cpi
+175.601 - 174.075
+#food away increase from march to october nominal cpi
+179.634	- 174.075
+# food away increase from oct 2020 to oct 2021
+188.377 -	179.634	
+# food away increase from march 2020 to oct 2021
+188.377	 -	174.075
+```
+# What food product experienced the largest increase in price?
+<p>In the latest report published by the BLS detailing the yearly price changes, “the index for meats, poultry, fish, and eggs increased 11.9 percent, with the index for beef rising 20.1 percent and the index for pork rising 14.1 percent, its largest 12-month increase since the period ending December 1990.” Why are these food items experiencing such large increases in price? In addition to the surge in demand for Food At Home driving up prices, the meat industry also faced massive issues with their workers becoming sick with COVID-19 which forced them to shut-down plants. According to the Food and Environment Reporting Network, there have been 59,148 COVID-19 cases among meatpacking workers since March 2020. Without a well-functioning meat processing plant, the supply of meat products likely decreased, further driving up the price. 
+<br>
+We do not observe the exact same nominal price increases here because the BLS uses a more comprehensive account of meat and dairy products, but the increases we see below closely follow the trend described by the BLS.</p>
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.align='center'}
+#average prices by type by date
+cpi %>% group_by(type, date) %>%
+  summarize(price_by_type = mean(price, na.rm  = TRUE)) %>%
+  ggplot(aes(x=date,y=price_by_type)) + geom_line(aes(color=type)) +
+  scale_color_discrete(name = "Product") +
+  xlab("Time") + ylab("Price") + labs(title = "Average Food Prices by Product Type", subtitle = "January 2000 - October 2021") + theme_bw() + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = 0, ymax = 7, alpha = .3)
+    
+```
+Let's exmaine the price trends of each type of product to get a better idea of what is driving the price changes:
+
+## Beef
+<p>Beef prices first spiked in April 2020 and hit a peak in June 2020 across all products. During this period, for example, beef steaks were $7.95 per lb in May of 2020 and jumped to $9.52 per pound in June 2020. Steak, roasts, and all other beef hit their highest prices in September 2021, following the upward trend in prices starting in the beginning of 2021. Beef is the most expensive type of product in our analysis and the product that experienced the highest nominal price increase during the pandemic.</p>
+```{r echo = FALSE, message = FALSE, warning =  FALSE, fig.show="hold", out.width="50%"}
+#plot for beef 2000-2021
+cpi %>% 
+  filter(type ==  "Beef") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,2), limits = c(0,10)) + scale_color_discrete(name = "Product") +
+  xlab("Time") + ylab("Price") + ggtitle("Beef Prices 2000-2021") + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + theme_bw() + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = 0, ymax = 10, alpha = .3) + theme(legend.position="left")
+
+#plot beef prices 2019-2021
+min <- as.Date("2019-01-01")
+max <- as.Date("2021-09-01")
+cpi %>% 
+  filter(type ==  "Beef") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,2), limits = c(0,10)) + scale_color_discrete(name = "Product") + 
+  scale_x_date(limits = c(min, max), date_breaks  ="2 month", date_labels = "%b-%Y") +
+  xlab("Time") + ylab("Price") + ggtitle("Beef Prices 2019-2021") + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + theme(legend.position = "none")
+```
+
+## Pork 
+Pork prices follow a similar trend as beef but their increases are less drastic than the changes in beef prices. All Other Pork experienced a price increase from $3.20 per pound to $3.40 between May and June 2021 and pork chops increased from $3.90 per pound to $4.10 per pound. There is a slight upward trend starting in the beginning of 2021, for example All other pork reached its highest point in July 2021 at over $3.50 per lb. 
+
+```{r echo = FALSE, message = FALSE, warning =  FALSE, fig.show="hold", out.width="50%"}
+cpi %>% 
+  filter(type ==  "Pork") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,1), limits = c(0,4.5)) + scale_color_discrete(name = "Product") +
+  xlab("Time") + ylab("Price") + ggtitle("Pork Prices 2000-2021") +theme_bw() + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = 0, ymax = 4.5, alpha = .3) + theme(legend.position="left")
+
+#plot pork prices 2019-2021
+min <- as.Date("2019-01-01")
+max <- as.Date("2021-09-01")
+cpi %>% 
+  filter(type ==  "Pork") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,0.5), limits = c(0,4.5)) + scale_color_discrete(name = "Product") + 
+  scale_x_date(limits = c(min, max),  date_breaks  ="2 month", date_labels = "%b-%Y") +
+  xlab("Time") + ylab("Price") + ggtitle("Pork Prices 2019-2021") + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + theme(legend.position = "none")
+```
+
+## Poultry 
+<p>Considering poultry now, the price increases seen here are much less noticeable than with pork and beef. There was relatively small nominal price increase in April 2020 for Boneless Chicken Breast and almost no nominal price increase for Bone-in Chicken Legs. The reason for this could be driven by the demand for poultry before the pandemic and the processing procedures for poultry. The poultry industry differs in that processing the meat is much less labor intensive so there is less contact with workers -- an important factor when a global pandemic hits. It could also be driven by the way that poultry is farmed and shipped across the US. 
+<br>
+We observe an increase in April 2020 and in June 2020, along with a small increase between winter 2021 and summer 2021. For example, the price of Chicken Breast went from $3.20 per pound in February 2021 to $3.50 per pound in August 2021.</p>
+```{r echo = FALSE, message = FALSE, warning =  FALSE, fig.show="hold", out.width="50%"}
+# plot poultry 2000-2021
+cpi %>% 
+  filter(type ==  "Poultry") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,1), limits = c(0,4)) + scale_color_discrete(name = "Product") +
+  xlab("Time") + ylab("Price") + ggtitle("Poultry Prices 2000-2021") +theme_bw() + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = 0, ymax = 4, alpha = .3) + theme(legend.position="left")
+
+#plot poultry prices 2019-2021
+min <- as.Date("2019-01-01")
+max <- as.Date("2021-09-01")
+cpi %>% 
+  filter(type ==  "Poultry") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,0.5), limits = c(0,4)) + scale_color_discrete(name = "Product") + 
+  scale_x_date(limits = c(min, max),  date_breaks  ="2 month", date_labels = "%b-%Y") +
+  xlab("Time") + ylab("Price") + ggtitle("Poultry Prices 2019-2021") + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + theme(legend.position = "none")
+```
+
+## Eggs
+<p>Eggs play an interesting role in this exploration because eggs serve as protein-rich substitute for meats. So when we see an increase in the price of beef driven mostly by supply chain issues, like was the case when COVID-19 hit, we also observe an increase in demand for the close substitutes of meat -- ie eggs. That is what we see here: the price of eggs increased from $1.50 per dozen to $2.00 per dozen in April 2020. Why do we observe the largest nominal price increase for eggs in April 2020 rather than in June, like we saw with poultry prices? Two possible explanations: 1) people substitute away from expensive proteins to the relatively cheaper choice of eggs, 2) the shelf life of eggs is much longer than meat products so when buying food in an emergency, eggs would appear to be a safer choice.
+<br>
+The price tapered off quickly after April 2020 but began to rise again in the summer of 2021 to over $1.50 per dozen.</p>
+```{r echo = FALSE, message = FALSE, warning =  FALSE, fig.show="hold", out.width="50%"}
+# eggs 2000-2021
+cpi %>% 
+  filter(type ==  "Eggs") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(color = "dodgerblue",size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,1), limits = c(0,3)) + scale_color_discrete(name = "Product") +
+  xlab("Time") + ylab("Price") + labs(title = "Egg Prices 2000-2021", 
+                                      subtitle = "Large Grade A, Per Dozen") + 
+  theme_bw() + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = 0, ymax = 3, alpha = .3) + theme(legend.position="left")
+
+#egg prices 2019-2021
+min <- as.Date("2019-01-01")
+max <- as.Date("2021-09-01")
+cpi %>% 
+  filter(type ==  "Eggs") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(color = "dodgerblue",size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,0.5), limits = c(0,2.25)) + scale_color_discrete(name = "Product") + 
+  scale_x_date(limits = c(min, max),  date_breaks  ="2 month", date_labels = "%b-%Y") +
+  xlab("Time") + ylab("Price") + labs(title  = "Egg Prices 2019-2021", subtitle = "Large Grade A, Per Dozen") + 
+  theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + theme(legend.position = "none")
+```
+
+## Dairy
+<p>Prices of dairy products follow each other closely with a steady rise in price since approximately 2018 and the spike in April 2020 is barely discernible even when looking closely at the prices of milk and cheese (butter prices do not extend into our smaller time frame). Cheese, for example, went from $5.30 per pound to $5.50 per pound in April 2020 and the price of milk only increased by 10 cents per gallon. These smaller increases could be due to the fact that dairy requires refrigeration during transportation so most dairy is produced somewhat locally, thus would less impacted by supply chain issues.</p>
+
+```{r echo = FALSE, message = FALSE, warning =  FALSE, fig.show="hold", out.width="50%"}
+# dairy 2000-2021
+cpi %>% 
+  filter(type ==  "Dairy") %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name),size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,1), limits = c(0,6)) + scale_color_discrete(name = "Product") +
+  xlab("Time") + ylab("Price") + labs(title = "Dairy Prices 2000-2021", 
+                                      subtitle = "") + 
+  theme_bw() + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + annotate("rect", xmin = as.Date("2007-12-01"), xmax = as.Date("2009-06-01"), ymin = 0, ymax = 6, alpha = .3) + theme(legend.position="left")
+
+#plot dairy prices 2019-2021
+min <- as.Date("2019-01-01")
+max <- as.Date("2021-09-01")
+cpi %>% 
+  filter(series_id == "APU0000709112" | series_id == "APU0000710212" ) %>%
+  ggplot(aes(x=date, y=price)) + geom_line(aes(color = series_name), size  = 0.5) +
+  scale_y_continuous(breaks=seq(0,10,1), limits = c(0,6)) + scale_color_manual(values = c("coral1", "dodgerblue")) + 
+  scale_x_date(limits = c(min, max),  date_breaks  ="2 month", date_labels = "%b-%Y")  +
+  xlab("Time") + ylab("Price") + ggtitle("Dairy Prices 2019-2021") + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1)) + geom_vline(xintercept = as.Date("2020-04-01"), linetype =  "dotted", color = "red") + theme(legend.position = "none")
+```
+
+# Are these price increases after COVID-19 a figment of our imagination? 
+<p>Along with examining the trends, we want to know if there is evidence that the nominal prices after COVID-19 are <em>actually</em> higher than the prices before COVID-19. To do this, we first need to adjust for inflation so that each price will have the same buying power. I have calculated the inflation adjusted prices for each item in our dataset based on the default base-year CPI that the BLS has chosen, 1984-1982. That means that when we estimate the difference in prices before and after COVID-19, the resulting nominal prices will look **a lot** smaller but we can bring them back up to 2021 dollars by using a simple equation: 
+$$
+\frac{CPI\, Value\, in\, 2021}{CPI\, Value\, in\, 1982-84}*Price\, In\, 1982-84 = Price\, In\, 2021
+$$
+The BLS makes the base-year CPI value equal to 100 and the CPI value for 2021 is 277 so we can simply multiply our results by 277/100 to obtain the price in current dollar value. 
+<br>
+How will we get our estimates of the impact of COVID-19 on price? I will use Ordinary Linear Regression (OLS) which allows us to find an estimate of the average price before and after COVID. The reason OLS is helpful here because we can show whether or not the difference between prices before COVID-19 and after COVID-19 is statistically significant, or whether the difference was due to chance or not. I will use OLS to estimate the following model: 
+$$
+AdjustedPrice = a + b*COVID + \epsilon
+$$ 
+where $a$ and $b$ are coefficients that we are estimating. The coefficient, $a$, will tell us the average price of the product type before the nation-wide state of emergency was declared on March 13th, 2020. $a$ will appear as the "Constant" in our  results table.The coefficient, $b$, will tell us the average price <em>increase</em> for the product type after the nation-wide state of emergency was declared. If we add $a$ and $b$ together, we will get the average price after COVID-19 for that product type. The $\epsilon$ is the term that catches the difference between our estimates and the true difference between prices before and after COVID-19, essentially we would like that number to be small because that means our model is closer to the true difference between prices before and after COVID-19. Let’s take a look at the results: 
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, results = 'asis'}
+cpi_allitems <- read_excel("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_allitems.xlsx")
+# remove top rows and unwanted columns
+cpi_allitems <- cpi_allitems[-c(1,2,3,4,5,6,7,8,9,10,11),]
+cpi_allitems <- cpi_allitems %>% subset(select = -c(...14, ...15))
+# rename columns
+cpi_allitems %<>% rename("year"= "CPI for All Urban Consumers (CPI-U)",
+                 "01" = "...2",
+                 "02" = "...3",
+                 "03" = "...4",
+                 "04" = "...5",
+                 "05" = "...6",
+                 "06" = "...7",
+                 "07" = "...8",
+                 "08" = "...9",
+                 "09"= "...10",
+                 "10" = "...11",
+                 "11" = "...12",
+                 "12" = "...13")
+# convert prices into numeric
+cols.num <- c("year","01","02","03", "04", "05", "06","07","08", "09","10","11","12")
+cpi_allitems[cols.num] <- sapply(cpi_allitems[cols.num],as.numeric)
+
+cpi_allitems$year <- factor(cpi_allitems$year)
+cpi_allitems$day <- "01"
+cpi_allitems %<>% gather(month, price, "01":"12", factor_key=TRUE) %>%
+  unite(date,year, month, day, sep = "-")
+cpi_allitems$date <- as.Date(cpi_allitems$date, format = "%Y-%m-%d")
+
+cpi_merge <- merge(cpi, cpi_allitems, by = "date")
+cpi_merge <- cpi_merge %>% mutate(index = price.y, 
+                                  nominal_price = price.x) %>%
+  subset(select = -c(price.x,price.y)) %>%
+  mutate(adjusted_price = nominal_price/index*100)
+
+
+cpi_merge <- cpi_merge %>% mutate(covid = ifelse(date > as.Date("2020-03-13"), 1, 0))
+beef_cpi <- cpi_merge %>% filter(type == "Beef")
+pork_cpi <- cpi_merge %>% filter(type == "Pork")
+poultry_cpi <- cpi_merge %>% filter(type == "Poultry")
+dairy_cpi <- cpi_merge %>% filter(type == "Dairy")
+eggs_cpi <- cpi_merge %>% filter(type == "Eggs")
+library(stargazer,pacman)
+p_load('sandwich')
+
+reg1 <- lm(adjusted_price ~ covid, data = beef_cpi)
+se1 <- sqrt(diag(vcovHC(reg1,  type = "HC1")))
+reg2 <- lm(adjusted_price ~ covid, data = pork_cpi)
+se2 <- sqrt(diag(vcovHC(reg2, type = "HC1")))
+reg3 <- lm(adjusted_price  ~ covid, data = poultry_cpi)
+se3 <- sqrt(diag(vcovHC(reg2,  type = "HC1")))
+reg4 <- lm(adjusted_price ~ covid, data = dairy_cpi)
+se4 <- sqrt(diag(vcovHC(reg3,  type = "HC1")))
+reg5 <- lm(adjusted_price ~ covid, data = eggs_cpi)
+se5 <- sqrt(diag(vcovHC(reg4,  type = "HC1")))
+
+stargazer(reg1, reg2, reg3, reg4, reg5, se = list(se1, se2, se3, se4,se5), column.labels = c("Beef","Pork","Poultry","Dairy", "Eggs"), covariate.labels = "After COVID-19", dep.var.labels = "Inflation Adjusted Price", type = 'html') 
+```
+
+## Results 
+<p>First, let’s consider which product types experienced a statistically significant price change: beef and dairy experienced a highly statistically significant price change after COVID-19, eggs experienced a slightly statistically significant price change after COVID-19, and pork and poultry experienced no statistically significant price change. We can confidently say that we have evidence that beef prices increased and that dairy prices decreased and the estimates for the other product types can still help inform our analysis.
+<br>
+Second, let’s look at our results in 2021 dollars. Remember our equation from above? I will demonstrate how we use this equation with the price of beef before COVID-19 in 2021 dollars: 
+$$
+\frac{277}{100}*1.962 = 5.45
+$$
+<br>
+For beef, the average price increased by $1.31 after COVID-19 so the average price after COVID-19 per pound of beef is $6.76. The average price of poultry before COVID-19 was $2.28 and increased by $0.32 after COVID-19 and the average price of pork was $3.66 and increased by $0.02 after COVID-19 (remember that those increases could have been from chance and are small). The average price of dairy before COVID-19 was $4.96 and decreased by $0.27 after COVID-19 and the average price of eggs was $1.99 before COVID-19 and decreased by $0.33.
+<br>
+
+### What could explain an increase in beef prices, no change in poultry and pork prices, and a decrease in egg and dairy prices?
+COVID-19 caused an economic recession and a lot of instability in the food system. Generally, during a recession prices decrease because people have fewer resources with which to buy things. We can see an example of this by looking at the 2008 recession where food prices decreased substantially (the area of the gray bar in the above graphs). However, in the case of COVID-19, there were also massive supply chain disruptions that increased shipping costs, factory shut-downs, labor shortages, and other factors that slowed distribution, decreasing the supply of some products and raising their prices. Products that are produced more locally, such as eggs and dairy, would have experienced less of an impact of supply chain disruptions. Beef, poultry, and pork come from all over the US and even internationally, so we would expect those products to be more impacted by supply chain disruptions. The decrease in price of dairy and eggs is likely from the impact of the recession whereas beef, pork, and poultry are experiencing upward pressure from supply chain disruptions. Beef is the only product type that experienced a statistically significant increase so we can imagine that the effects described above were more potent for the beef industry. The beef industry has also undergone massive changes in the last 30 years. Currently, the top-four largest beef-packing companies control 82% of the market. The poultry and pork industries have also become more concentrated but to a lesser degree: the largest four poultry-packing companies control 54% of the market while the largest four pork-processing companies control 66%. The issue with having so few firms control all the beef supply is that they are able to influence the price of their products more easily to obtain higher profits and that they could be more vulnerable to huge market shocks, like the pandemic.
+<br>
+We may not think a $1.31 increase per pound of beef sounds like much but the whole picture of food prices increasing by 1.6% will cause major issues for Americans. The issue with inflation is that wage increases do not follow the rate of inflation exactly. The BLS reported this past summer that real average hourly wages (meaning wages adjusted for inflation) have actually decreased by 2.8%. Americans’ abilities to purchase the same amount of goods they did before the pandemic has decreased, i.e. they can afford less. With access to the vaccine now, the social stress of the pandemic may be gone but the economic consequences are far from over as many Americans still face difficult choices at the grocery store. 
+<br>
+<br>
+<em> Note: there are many factors that impact price dynamics and our model is simple which means it will be less accurate but we can still learn a lot from this preliminary analysis.</em></p> 
+
+
+
+
+```{r echo = FALSE, message = FALSE, eval = FALSE}
+
+(277/100)*(1.966) # average beef price pre-covid
+(277/100)*0.471 # beef increased by 1.31
+(277/100)*0.823 # average poultry price pre-covid 
+(277/100)*0.116 #  poultry increased by 0.32
+(277/100)*1.323 # average pork price pre-covid
+(277/100)*0.009 # pork increased by 0.02
+(277/100)*1.792 # average dairy price pre-covid
+(277/100)*-0.097 # dairy decreased by 0.27
+(277/100)*0.718 # average egg price pre-covid
+(277/100)*-0.12 # eggs decreased by 0.33
+```
+## Sources 
+<p> [BLS News Release November 10th](https://www.bls.gov/news.release/cpi.nr0.htm)
+<br>
+[Average Share of Income Spent on Food in the United States Remained Relatively Steady From 2000 to 2019](https://www.ers.usda.gov/amber-waves/2020/november/average-share-of-income-spent-on-food-in-the-united-states-remained-relatively-steady-from-2000-to-2019/)
+<br>
+[The impact of the COVID-19 pandemic on food price indexes and data collection](https://www.bls.gov/opub/mlr/2020/article/the-impact-of-the-covid-19-pandemic-on-food-price-indexes-and-data-collection.htm#_edn7)
+<br>
+[Food Price Outlook, 2021](https://www.ers.usda.gov/data-products/food-price-outlook/summary-findings/)
+<br>
+[Long lines, low supplies: Coronavirus chaos sends shoppers into panic-buying mode](https://www.washingtonpost.com/business/2020/03/02/grocery-stores-coronavirus-panic-buying/)
+<br>
+[Panicked Shoppers Empty Shelves as Coronavirus Anxiety Rises](https://www.nytimes.com/2020/03/13/nyregion/coronavirus-panic-buying.html)
+<br>
+[Congressional Research Services:Consumers and Food Price Inflation](https://sgp.fas.org/crs/misc/R40545.pdf)
+<br>
+[The New U.S. Meat Industry](https://core.ac.uk/download/pdf/6793339.pdf)
+<br>
+[Mapping COVID-19 Outbreak in The Food System](https://thefern.org/2020/04/mapping-covid-19-in-meat-and-food-processing-plants/)
+<br>
+[Addressing Concentration In The Meat Processing Industry To Lower Food Prices](https://www.whitehouse.gov/briefing-room/blog/2021/09/08/addressing-concentration-in-the-meat-processing-industry-to-lower-food-prices-for-american-families/)
+<br>
+[Math calculations to better utilize CPI data](https://www.bls.gov/cpi/factsheets/cpi-math-calculations.pdf)
+<br>
+[Times Series Analysis, Regression, and Forecasting](https://timeseriesreasoning.com/contents/inflation-adjustment/)
+<br>
