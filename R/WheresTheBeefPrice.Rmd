@@ -3,9 +3,10 @@ title: "Where's the Beef... <em>Price</em>?"
 author: Natalie Walker 
 date: "November 24th, 2021"
 output:
-  md_document: default 
-  html_document: default
   pdf_document: default
+  html_document: default
+  md_document: default
+urlcolor: blue
 ---
 ```{r echo=FALSE}
 #This block code will make knitting faster by saving output of code chunks.
@@ -652,7 +653,6 @@ $$
 AdjustedPrice = a + b*COVID + \epsilon
 $$ 
 where $a$ and $b$ are coefficients that we are estimating. The coefficient, $a$, will tell us the average price of the product type before the nation-wide state of emergency was declared on March 13th, 2020. $a$ will appear as the "Constant" in our  results table.The coefficient, $b$, will tell us the average price <em>increase</em> for the product type after the nation-wide state of emergency was declared. If we add $a$ and $b$ together, we will get the average price after COVID-19 for that product type. The $\epsilon$ is the term that catches the difference between our estimates and the true difference between prices before and after COVID-19, essentially we would like that number to be small because that means our model is closer to the true difference between prices before and after COVID-19. Let’s take a look at the results: 
-
 ```{r echo = FALSE, message = FALSE, warning = FALSE, results = 'asis'}
 cpi_allitems <- read_excel("/Users/natalie/Documents/Economics\ /cpi\ data/cpi_allitems.xlsx")
 # remove top rows and unwanted columns
@@ -709,7 +709,20 @@ se4 <- sqrt(diag(vcovHC(reg3,  type = "HC1")))
 reg5 <- lm(adjusted_price ~ covid, data = eggs_cpi)
 se5 <- sqrt(diag(vcovHC(reg4,  type = "HC1")))
 
-stargazer(reg1, reg2, reg3, reg4, reg5, se = list(se1, se2, se3, se4,se5), column.labels = c("Beef","Pork","Poultry","Dairy", "Eggs"), covariate.labels = "After COVID-19", dep.var.labels = "Inflation Adjusted Price", type = 'html') 
+m = stargazer(reg1, reg2, reg3, reg4, reg5, se = list(se1, se2, se3, se4,se5), column.labels = c("Beef","Pork","Poultry","Dairy", "Eggs"), covariate.labels = "After COVID-19", dep.var.labels = "Inflation Adjusted Price", type = 'latex', header=FALSE, # to get rid of r package output text
+
+          single.row = TRUE, # to put coefficients and standard errors on same line
+
+          no.space = TRUE, # to remove the spaces after each line of coefficients
+
+          column.sep.width = "3pt", # to reduce column width
+
+          font.size = "small", # to make font size smaller
+          keep.stat = "n" 
+
+) 
+
+#resizebox.stargazer(m, tab.width = "0.7\\textwidth")
 ```
 
 ## Results 
@@ -747,28 +760,30 @@ We may not think a $1.31 increase per pound of beef sounds like much but the who
 (277/100)*0.718 # average egg price pre-covid
 (277/100)*-0.12 # eggs decreased by 0.33
 ```
+
 ## Sources 
-<p> [BLS News Release November 10th](https://www.bls.gov/news.release/cpi.nr0.htm)
-<br>
-[Average Share of Income Spent on Food in the United States Remained Relatively Steady From 2000 to 2019](https://www.ers.usda.gov/amber-waves/2020/november/average-share-of-income-spent-on-food-in-the-united-states-remained-relatively-steady-from-2000-to-2019/)
-<br>
-[The impact of the COVID-19 pandemic on food price indexes and data collection](https://www.bls.gov/opub/mlr/2020/article/the-impact-of-the-covid-19-pandemic-on-food-price-indexes-and-data-collection.htm#_edn7)
-<br>
-[Food Price Outlook, 2021](https://www.ers.usda.gov/data-products/food-price-outlook/summary-findings/)
-<br>
-[Long lines, low supplies: Coronavirus chaos sends shoppers into panic-buying mode](https://www.washingtonpost.com/business/2020/03/02/grocery-stores-coronavirus-panic-buying/)
-<br>
-[Panicked Shoppers Empty Shelves as Coronavirus Anxiety Rises](https://www.nytimes.com/2020/03/13/nyregion/coronavirus-panic-buying.html)
-<br>
-[Congressional Research Services:Consumers and Food Price Inflation](https://sgp.fas.org/crs/misc/R40545.pdf)
-<br>
-[The New U.S. Meat Industry](https://core.ac.uk/download/pdf/6793339.pdf)
-<br>
-[Mapping COVID-19 Outbreak in The Food System](https://thefern.org/2020/04/mapping-covid-19-in-meat-and-food-processing-plants/)
-<br>
-[Addressing Concentration In The Meat Processing Industry To Lower Food Prices](https://www.whitehouse.gov/briefing-room/blog/2021/09/08/addressing-concentration-in-the-meat-processing-industry-to-lower-food-prices-for-american-families/)
-<br>
-[Math calculations to better utilize CPI data](https://www.bls.gov/cpi/factsheets/cpi-math-calculations.pdf)
-<br>
-[Times Series Analysis, Regression, and Forecasting](https://timeseriesreasoning.com/contents/inflation-adjustment/)
-<br>
+| [BLS News Release November 10th](https://www.bls.gov/news.release/cpi.nr0.htm)
+
+| [Average Share of Income Spent on Food in the United States Remained Relatively Steady From 2000 to 2019](https://www.ers.usda.gov/amber-waves/2020/november/average-share-of-income-spent-on-food-in-the-united-states-remained-relatively-steady-from-2000-to-2019/)
+
+| [The impact of the COVID-19 pandemic on food price indexes and data collection](https://www.bls.gov/opub/mlr/2020/article/the-impact-of-the-covid-19-pandemic-on-food-price-indexes-and-data-collection.htm#_edn7)
+
+| [Food Price Outlook, 2021](https://www.ers.usda.gov/data-products/food-price-outlook/summary-findings/)
+
+| [Long lines, low supplies: Coronavirus chaos sends shoppers into panic-buying mode](https://www.washingtonpost.com/business/2020/03/02/grocery-stores-coronavirus-panic-buying/)
+
+| [Panicked Shoppers Empty Shelves as Coronavirus Anxiety Rises](https://www.nytimes.com/2020/03/13/nyregion/coronavirus-panic-buying.html)
+
+| [Congressional Research Services:Consumers and Food Price Inflation](https://sgp.fas.org/crs/misc/R40545.pdf)
+
+| [The New U.S. Meat Industry](https://core.ac.uk/download/pdf/6793339.pdf)
+
+| [Mapping COVID-19 Outbreak in The Food System](https://thefern.org/2020/04/mapping-covid-19-in-meat-and-food-processing-plants/)
+
+| [Addressing Concentration In The Meat Processing Industry To Lower Food Prices](https://www.whitehouse.gov/briefing-room/blog/2021/09/08/addressing-concentration-in-the-meat-processing-industry-to-lower-food-prices-for-american-families/)
+
+| [Math calculations to better utilize CPI data](https://www.bls.gov/cpi/factsheets/cpi-math-calculations.pdf)
+
+| [Times Series Analysis, Regression, and Forecasting](https://timeseriesreasoning.com/contents/inflation-adjustment/)
+
+
